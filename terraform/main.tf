@@ -7,7 +7,7 @@ terraform {
 
     backend "s3" {
         region = "sa-east-1"
-        key    = "terraform.tfstate"
+        key    = "terraform-discord-go-lamba.tfstate"
     }
 }
 
@@ -15,7 +15,7 @@ provider "aws" {
     region = "sa-east-1"
 }
 
-resource "aws_lambda_function" "golang_example_function" {
+resource "aws_lambda_function" "discord_go_lambda" {
     filename      = "./lambda.zip"               # caminho para o código da sua função
     function_name = "discord-go-lambda"          # nome da sua função Lambda
     role          = aws_iam_role.lambda_role.arn # ARN da role IAM associada à função
