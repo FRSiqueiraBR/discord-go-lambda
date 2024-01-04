@@ -28,6 +28,11 @@ resource "aws_lambda_function" "discord_go_lambda" {
   source_code_hash = filebase64sha256("./lambda.zip")
 }
 
+resource "aws_lambda_function_url" "discord_go_lambda_url" {
+  function_name      = aws_lambda_function.discord_go_lambda.function_name
+  authorization_type = "NONE"
+}
+
 resource "aws_iam_role" "lambda_role" {
   name = "lambda_role"
 
