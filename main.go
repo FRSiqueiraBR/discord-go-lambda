@@ -1,9 +1,10 @@
 package main
 
 import (
-	"context"
+	"encoding/json"
 	"fmt"
 
+	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
@@ -11,15 +12,23 @@ type Response struct {
 	Message string `json:"message"`
 }
 
-func handler(ctx context.Context) (Response, error) {
-	fmt.Println(ctx)
-	fmt.Println("Hello, World!")
+func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	rawBody := request.Body
+	fmt.Println("Start")
+	fmt.Println("Body: ", rawBody)
 
-	resp := Response{
-		Message: "Olá, mundo!",
-	}
+	json, _ := json.Marshal(
+		struct {
+			Type int `json:"type"`
+		}{
+			Type: 1,
+		},
+	)
 
-	return resp, nil
+	return events.APIGatewayProxyResponse{
+		Body:       string(json),
+		StatusCode: 200,
+	}, nil
 }
 
 func main() {
