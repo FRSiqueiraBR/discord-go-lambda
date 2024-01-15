@@ -23,8 +23,8 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	fmt.Println(request)
 	fmt.Println("Body: ", rawBody)
 
-	signature := request.Headers["X-Signature-Ed25519"]
-	timestamp := request.Headers["X-Signature-Timestamp"]
+	signature := request.Headers["x-signature-ed25519"]
+	timestamp := request.Headers["x-signature-timestamp"]
 
 	fmt.Println("Signature: ", signature)
 	fmt.Println("Timestamp: ", timestamp)
