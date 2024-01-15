@@ -26,6 +26,12 @@ resource "aws_lambda_function" "discord_go_lambda" {
   timeout       = 30                           # tempo limite de execução da função em segundos
 
   source_code_hash = filebase64sha256("./lambda.zip")
+
+  environment {
+    variables = {
+      APPLICATION_PUBLIC_KEY = "${var.application_public_key}"
+    }
+  }
 }
 
 resource "aws_lambda_function_url" "discord_go_lambda_url" {
