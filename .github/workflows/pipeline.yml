@@ -95,7 +95,8 @@ jobs:
       run: |
         terraform apply -input=false -auto-approve \
         -var="access_key=${{ secrets.AWS_ACCESS_KEY }}" \
-        -var="secret_key=${{ secrets.AWS_SECRET_ACESS_KEY }}"
+        -var="secret_key=${{ secrets.AWS_SECRET_ACESS_KEY }}" \
+        -var="application_public_key=${{ secrets.APPLICATION_PUBLIC_KEY}}"
 
   destroy:
     needs: 
