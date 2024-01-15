@@ -28,6 +28,7 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 
 	// Verify the request signature
 	isVerified := verifySignature(signature, timestamp, rawBody)
+	fmt.Println("isVerified: ", isVerified)
 
 	// Respond accordingly
 	if !isVerified {
@@ -53,6 +54,9 @@ func verifySignature(signature string, timestamp string, body string) bool {
 	// Decode hex signature and public key
 	decodedSignature, _ := hex.DecodeString(signature)
 	decodedPublicKey, _ := hex.DecodeString(applicationPublicKey)
+
+	fmt.Println("Signature: ", decodedSignature)
+	fmt.Println("PublicKey: ", decodedPublicKey)
 
 	// Verify the signature
 	return ed25519.Verify(decodedPublicKey, []byte(message), decodedSignature)
