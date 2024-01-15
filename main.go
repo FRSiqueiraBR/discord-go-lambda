@@ -2,6 +2,10 @@ package main
 
 import (
 	"fmt"
+	"os"
+
+	"crypto/ed25519"
+	"encoding/hex"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -19,10 +23,39 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	fmt.Println(request)
 	fmt.Println("Body: ", rawBody)
 
+	signature := request.Headers["X-Signature-Ed25519"]
+	timestamp := request.Headers["X-Signature-Timestamp"]
+
+	// Verify the request signature
+	isVerified := verifySignature(signature, timestamp, rawBody)
+
+	// Respond accordingly
+	if !isVerified {
+		return events.APIGatewayProxyResponse{
+			Body:       "invalid request signature",
+			StatusCode: 401,
+		}, nil
+	}
+
 	return events.APIGatewayProxyResponse{
 		Body:       "{\"type\": 1}",
 		StatusCode: 200,
 	}, nil
+}
+
+func verifySignature(signature string, timestamp string, body string) bool {
+	// Concatenate timestamp and body
+	message := timestamp + body
+
+	// Get application public key
+	applicationPublicKey := os.Getenv("APPLICATION_PUBLIC_KEY")
+
+	// Decode hex signature and public key
+	decodedSignature, _ := hex.DecodeString(signature)
+	decodedPublicKey, _ := hex.DecodeString(applicationPublicKey)
+
+	// Verify the signature
+	return ed25519.Verify(decodedPublicKey, []byte(message), decodedSignature)
 }
 
 func main() {
