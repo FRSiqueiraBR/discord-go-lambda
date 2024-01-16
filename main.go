@@ -2,13 +2,11 @@ package main
 
 import (
 	"fmt"
-	"os"
-
-	"crypto/ed25519"
-	"encoding/hex"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+
+	"github.com/FRSiqueiraBR/discord-go-lambda/internal/usecase/signature"
 )
 
 type BodyResponse struct {
@@ -23,15 +21,7 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	fmt.Println(request)
 	fmt.Println("Body: ", rawBody)
 
-	signature := request.Headers["x-signature-ed25519"]
-	timestamp := request.Headers["x-signature-timestamp"]
-
-	fmt.Println("Signature: ", signature)
-	fmt.Println("Timestamp: ", timestamp)
-
-	// Verify the request signature
-	isVerified := verifySignature(signature, timestamp, rawBody)
-	fmt.Println("isVerified: ", isVerified)
+	isVerified := signature.Handle(request.Headers, rawBody)
 
 	// Respond accordingly
 	if !isVerified {
@@ -45,25 +35,6 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 		Body:       "{\"type\": 4, \"data\": {\"content\": \"Hello, World.\"}}",
 		StatusCode: 200,
 	}, nil
-}
-
-func verifySignature(signature string, timestamp string, body string) bool {
-	// Concatenate timestamp and body
-	message := timestamp + body
-
-	// Get application public key
-	applicationPublicKey := os.Getenv("APPLICATION_PUBLIC_KEY")
-	fmt.Println("APPLICATION_PUBLIC_KEY: ", applicationPublicKey)
-
-	// Decode hex signature and public key
-	decodedSignature, _ := hex.DecodeString(signature)
-	decodedPublicKey, _ := hex.DecodeString(applicationPublicKey)
-
-	fmt.Println("Signature: ", decodedSignature)
-	fmt.Println("PublicKey: ", decodedPublicKey)
-
-	// Verify the signature
-	return ed25519.Verify(decodedPublicKey, []byte(message), decodedSignature)
 }
 
 func main() {
